@@ -1,0 +1,116 @@
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration build-checksum="684991121" file="C:\Users\RT\Documents\MATLAB\rthomson_ereef_git\eReef.prj" location="C:\Users\RT\Documents\MATLAB\rthomson_ereef_git" name="eReef" preferred-package-location="C:\Users\RT\Documents\MATLAB\rthomson_ereef_git\eReef\for_redistribution" preferred-package-type="package.type.exe" target="target.ezdeploy.standalone" target-name="Application Compiler">
+    <param.appname>eReef</param.appname>
+    <param.icon />
+    <param.icons />
+    <param.version>1.0</param.version>
+    <param.authnamewatermark>Richard Thomson</param.authnamewatermark>
+    <param.email />
+    <param.company />
+    <param.summary>Technical Selection Task A</param.summary>
+    <param.description>Accesses data for CSIRO’s Great Barrier Reef GBR4 model results using one or more of the data access endpoints which are documented at https://dapds00.nci.org.au/thredds/catalog/fx3/gbr1_2.0/catalog.html?dataset=fx3-gbr1_2.0/gbr1_simple_2022-03-11.nc
+
+Visualises the temperature (temp) field as a 2D map of temperature  at a single depth and time over all latitude and longitude coordinates.
+
+Includes a selectable plot of temperature as a function of time and depth for a chosen longitude/latitude.
+
+Includes Stretch objective:  adds the current data ([u, v] vector field) overlaid on the temperature plot.</param.description>
+    <param.screenshot />
+    <param.guid />
+    <param.installpath.string>\eReef\</param.installpath.string>
+    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
+    <param.logo />
+    <param.install.notes />
+    <param.target.install.notes />
+    <param.intermediate>${PROJECT_ROOT}\eReef\for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}\eReef\for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}\eReef\for_redistribution</param.output>
+    <param.logdir>${PROJECT_ROOT}\eReef</param.logdir>
+    <param.enable.clean.build>false</param.enable.clean.build>
+    <param.user.defined.mcr.options />
+    <param.target.type>subtarget.standalone</param.target.type>
+    <param.support.packages />
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>false</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>ereef_rthomson_app</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.windows.command.prompt>true</param.windows.command.prompt>
+    <param.create.log>false</param.create.log>
+    <param.log.file />
+    <param.native.matlab>false</param.native.matlab>
+    <param.checkbox>false</param.checkbox>
+    <param.example />
+    <param.help.text>Syntax 
+	  -? 
+	 
+ Input Arguments 
+	 -?  print help on how to use the application 
+	 input arguments</param.help.text>
+    <unset>
+      <param.icon />
+      <param.icons />
+      <param.version />
+      <param.email />
+      <param.company />
+      <param.screenshot />
+      <param.guid />
+      <param.installpath.string />
+      <param.installpath.combo />
+      <param.logo />
+      <param.install.notes />
+      <param.target.install.notes />
+      <param.intermediate />
+      <param.files.only />
+      <param.output />
+      <param.logdir />
+      <param.enable.clean.build />
+      <param.user.defined.mcr.options />
+      <param.target.type />
+      <param.support.packages />
+      <param.web.mcr />
+      <param.package.mcr />
+      <param.no.mcr />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.windows.command.prompt />
+      <param.create.log />
+      <param.log.file />
+      <param.native.matlab />
+      <param.checkbox />
+      <param.example />
+    </unset>
+    <fileset.main>
+      <file>${PROJECT_ROOT}\ereef_main.mlapp</file>
+    </fileset.main>
+    <fileset.resources />
+    <fileset.package />
+    <fileset.depfun />
+    <build-deliverables>
+      <file location="${PROJECT_ROOT}\eReef\for_testing" name="readme.txt" optional="true">C:\Users\RT\Documents\MATLAB\rthomson_ereef_git\eReef\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\eReef\for_testing" name="splash.png" optional="false">C:\Users\RT\Documents\MATLAB\rthomson_ereef_git\eReef\for_testing\splash.png</file>
+      <file location="${PROJECT_ROOT}\eReef\for_testing" name="eReef.exe" optional="false">C:\Users\RT\Documents\MATLAB\rthomson_ereef_git\eReef\for_testing\eReef.exe</file>
+    </build-deliverables>
+    <workflow />
+    <matlab>
+      <root>C:\Program Files\MATLAB\R2021b</root>
+      <toolboxes />
+    </matlab>
+    <platform>
+      <unix>false</unix>
+      <mac>false</mac>
+      <windows>true</windows>
+      <win2k>false</win2k>
+      <winxp>false</winxp>
+      <vista>false</vista>
+      <linux>false</linux>
+      <solaris>false</solaris>
+      <osver>10.0</osver>
+      <os32>false</os32>
+      <os64>true</os64>
+      <arch>win64</arch>
+      <matlab>true</matlab>
+    </platform>
+  </configuration>
+</deployment-project>
