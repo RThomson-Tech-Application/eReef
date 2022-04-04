@@ -82,7 +82,7 @@ This will then spawn a new figure showing the **temperature** **map** with respe
 
 ![](/screenshots/tempDepthTimeMap.PNG)
 
-The user can click on the map to display the **Temperature** at a specific **Time** and **Elevation**. This also shows the **lowest depth** (white = no data), in this case 315m
+The user can click on the map to display the **Temperature** at a specific **Time** and **Elevation**. This also shows the **lowest depth** (white = no data), in this case 270m
 
 ### Additional options
 
