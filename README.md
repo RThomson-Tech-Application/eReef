@@ -30,7 +30,7 @@ Matlab toolboxes required: *Mapping*, *Image Processing*.
 
 The two `reefmap` files in the repo are also required to display the map as a background
 
-The program can be run as a script within a Matlab installation (limited capability if not R2021b or above) using either `ereef.mlapp` or `ereef.m`
+The program can be run as a script within a Matlab installation (limited capability if not R2021b or above) using either `ereef.mlapp` or `ereef_exported.m`
 
 ##### <u>If a Matlab installation is not available:</u>
 
