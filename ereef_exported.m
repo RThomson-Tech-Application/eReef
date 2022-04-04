@@ -52,9 +52,8 @@ classdef ereef_exported < matlab.apps.AppBase
                 waitfor(err_dlg); thisApp.delete;
             end
 
-            % Only time is an unlimited variable
-            unlimDims = [ginfo.Dimensions.Unlimited];
-            disp(ginfo.Dimensions(unlimDims));
+            % Only time is an unlimited variable 
+            unlimDims = [ginfo.Dimensions.Unlimited]; 
             
             % make sure the datasource has the var names expected
             try
