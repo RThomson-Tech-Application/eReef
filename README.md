@@ -1,5 +1,5 @@
 ---
-typora-root-url: screenshots
+typora-root-url: ./
 ---
 
 # **Technical Selection - Task A - Richard Thomson**
@@ -44,13 +44,13 @@ This will also download the *Matlab Runtime Environment* (~700M)
 
 The GUI visualises the temperature field as a 2D map at a **selectable depth** (Elevation / zc) and **selectable time** over the range of latitude & longitude coordinates available. The background map was borrowed from your website!
 
-![](/mainGui.PNG)
+![](/screenshots/mainGui.PNG)
 
 
 
 ### Control Panel
 
-#### ![](/controlPanel_URL.png)
+#### ![](/screenshots/controlPanel_URL.png)
 
 1. The *Data Source URL* can be modified to access data from a **different day**. The URL is checked for validity and the presence of expected data
 
@@ -68,14 +68,12 @@ The GUI visualises the temperature field as a 2D map at a **selectable depth** (
 
 By clicking the following button:
 
-![](/button.PNG)
+![](/screenshots/button.PNG)
 
 a crosshairs will appear (this feature in Matlab is slow unfortunately) allowing the user to select a **specific longitude and latitude**.
 
 This will spawn a new figure showing the **temperature** **map** with respect to the **depth** and the **time**:
 
-![](/tempDepthTimeMap.PNG)
-
-
+![](/screenshots/tempDepthTimeMap.PNG)
 
 The user can click on the map to display the **Temperature** at a specific **Time** and **Elevation**. This also shows the **lowest depth** (white = no data), in this case 315m
