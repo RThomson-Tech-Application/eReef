@@ -2,21 +2,25 @@ classdef ereef < matlab.apps.AppBase
 
     % Properties that correspond to app components
     properties (Access = public)
-        UIFigure                     matlab.ui.Figure
-        ControlPanel                 matlab.ui.container.Panel
-        AutoScaleCurrentsCheckBox    matlab.ui.control.CheckBox
-        DataSourceURLEditField       matlab.ui.control.EditField
-        DataSourceURLEditFieldLabel  matlab.ui.control.Label
-        TimeDropDown                 matlab.ui.control.DropDown
-        TimeDropDownLabel            matlab.ui.control.Label
-        ElevationmDropDown           matlab.ui.control.DropDown
-        ElevationmDropDownLabel      matlab.ui.control.Label
+        UIFigure                      matlab.ui.Figure
+        ControlPanel                  matlab.ui.container.Panel
+        ScaleFactorCurrentsEditField  matlab.ui.control.NumericEditField
+        ScaleFactorCurrentsEditFieldLabel  matlab.ui.control.Label
+        ScaleFactorTempEditField      matlab.ui.control.NumericEditField
+        ScaleFactorTempLabel          matlab.ui.control.Label
+        AutoScaleCurrentsCheckBox     matlab.ui.control.CheckBox
+        DataSourceURLEditField        matlab.ui.control.EditField
+        DataSourceURLEditFieldLabel   matlab.ui.control.Label
+        TimeDropDown                  matlab.ui.control.DropDown
+        TimeDropDownLabel             matlab.ui.control.Label
+        ElevationmDropDown            matlab.ui.control.DropDown
+        ElevationmDropDownLabel       matlab.ui.control.Label
         ScaleTemperatureColourBarCheckBox  matlab.ui.control.CheckBox
-        ShowCurrentsCheckBox         matlab.ui.control.CheckBox
+        ShowCurrentsCheckBox          matlab.ui.control.CheckBox
         SelectLocationforTimeElevationTemperatureMapButton  matlab.ui.control.Button
-        TemperaturePanel             matlab.ui.container.Panel
-        MainPlot                     matlab.ui.control.UIAxes
-        StatusLabel                  matlab.ui.control.Label
+        TemperaturePanel              matlab.ui.container.Panel
+        MainPlot                      matlab.ui.control.UIAxes
+        StatusLabel                   matlab.ui.control.Label
     end
 
     
@@ -270,21 +274,27 @@ classdef ereef < matlab.apps.AppBase
 
             %fprintf('min temp = %1.4f, max = %1.4f\n',min(temps_Txs),max(temps_Txs))
             
-            % load created geotiff of map borrowed from the eReef website
+            % load created geotiff of map borrowed from the eReef website.
+            % If mapping toolbox not installed, will catch:
             try
                 g = geoshow(app.MainPlot, 'reefmap.tif');
                 % Set the coordinates based on the geotiff:
                 app.MainPlot.XLim = [min(g.XData(:)) max(g.XData(:))];
                 app.MainPlot.YLim = [min(g.YData(:)) max(g.YData(:))];
             catch
-                %err_dlg = errordlg('Map file missing: reefmap.tif and world file .tfw','ERROR');
-                
+                % if mapping toolbox not available, make do:
+                err_dlg = errordlg('Is the Matlab Mapping toolbox available? ','Warning');
+                waitfor(err_dlg);
                 app.MainPlot.XLim = [142.2860  156.4540];
                 app.MainPlot.YLim = [-29.4780 -7.3860   ];
                 set(app.MainPlot, 'YDir','normal')
+                % if reefmap.tif not found, will not load background map
                 if isfile('reefmap.tif')
                     img = flipud(imread('reefmap.tif'));
                     imagesc(app.MainPlot, app.MainPlot.XLim, app.MainPlot.YLim, img);
+                else
+                    err_dlg = errordlg('reefmap.tif not in path','ERROR');
+                    waitfor(err_dlg);
                 end
                 set(app.MainPlot, 'YDir','normal')
                 %waitfor(err_dlg);              
@@ -292,8 +302,7 @@ classdef ereef < matlab.apps.AppBase
             hold(app.MainPlot,'on');
 
             % plot a portion (every nth value) of the temperatures
-            % TODO: allow user to set this option, higher for speed.
-            n = 1;
+            n = app.ScaleFactorTempEditField.Value;
             scatter(app.MainPlot,lngs_Txs(1:n:end), lats_Txs(1:n:end),10, temps_Txs(1:n:end),'filled');
             hold(app.MainPlot,'on');
          
@@ -310,8 +319,8 @@ classdef ereef < matlab.apps.AppBase
             end
 
             % plot a portion (every nth value) of the u,v currents
-            % TODO: allow user to set this option, higher for smaller and more arrows.
-            n = 2000;
+            n = app.ScaleFactorCurrentsEditField.Value;
+
             %app.globalHandles.q = quiver(app.MainPlot,lngs_Txs(1:n:end), lats_Txs(1:n:end), u_Txs(1:n:end), v_Txs(1:n:end),'color',[0,0,0]); 
             if app.AutoScaleCurrentsCheckBox.Value == 1, autoScale = 'on'; else, autoScale = 'off'; end
             app.globalHandles.q = quiver(app.MainPlot,lngs_Txs(1:n:end), lats_Txs(1:n:end), u_Txs(1:n:end), v_Txs(1:n:end),'color',[0,0,0],'AutoScale',autoScale); 
@@ -411,8 +420,9 @@ classdef ereef < matlab.apps.AppBase
 
             dataURL = app.DATA.sourceURL;
             
-            % get longitude and latitude selected by user
-            c = app.DATA.selectionCoords;
+            % get longitude and latitude selected by user, correct for base
+            % 0 vs base 1
+            c = app.DATA.selectionCoords - 1
             
             % select full range of times and zc
             tMax = num2str(app.DATA.dims.time - 1);
@@ -611,67 +621,6 @@ classdef ereef < matlab.apps.AppBase
             readyCursor(app)
         end
 
-        % Value changed function: ElevationmDropDown
-        function ElevationmDropDownValueChanged(app, event)
-            %value = app.ElevationmDropDown.Value;
-            app.TemperaturePanel.Title = 'Loading new values for new Depth selection...';
-            drawnow
-            retriveVariableData(app)
-            plotTempCurrentMap(app)
-            app.TemperaturePanel.Title = 'Temperature';
-        end
-
-        % Value changed function: TimeDropDown
-        function TimeDropDownValueChanged(app, event)
-            %value = app.TimeDropDown.Value;
-            app.TemperaturePanel.Title = 'Loading new values for new Time selection...';
-            drawnow
-            retriveVariableData(app)
-            plotTempCurrentMap(app)
-            app.TemperaturePanel.Title = 'Temperature';
-        end
-
-        % Button pushed function: 
-        % SelectLocationforTimeElevationTemperatureMapButton
-        function SelectLocationforTimeElevationTemperatureMapButtonPushed(app, event)
-            if verLessThan('Matlab', '9.9')
-                err_dlg = errordlg('Not supported prior to Matlab R2020b');
-                waitfor(err_dlg);
-            else
-                createTimeTempArray(app)
-            end
-        end
-
-        % Value changed function: ShowCurrentsCheckBox
-        function ShowCurrentsCheckBoxValueChanged(app, event)
-            % Toggle on/off currents
-            if app.ShowCurrentsCheckBox.Value == 1 
-                set(app.globalHandles.q,'Visible','on');
-                % if the currents are autoscaled, the scale is meaningless
-                % so switch it off
-                if app.AutoScaleCurrentsCheckBox.Value == 0
-                    set(app.globalHandles.qLeg1,'Visible','on');
-                    set(app.globalHandles.qLeg2,'Visible','on');
-                    set(app.globalHandles.qLeg3,'Visible','on');
-                else
-                    set(app.globalHandles.qLeg1,'Visible','off');
-                    set(app.globalHandles.qLeg2,'Visible','off');
-                    set(app.globalHandles.qLeg3,'Visible','off');
-                end
-            else
-                set(app.globalHandles.q,'Visible','off');
-                set(app.globalHandles.qLeg1,'Visible','off');
-                set(app.globalHandles.qLeg2,'Visible','off');
-                set(app.globalHandles.qLeg3,'Visible','off');
-            end
-        end
-
-        % Value changed function: ScaleTemperatureColourBarCheckBox
-        function ScaleTemperatureColourBarCheckBoxValueChanged(app, event)
-            %value = app.ScaleTemperatureColourBarCheckBox.Value;
-            plotTempCurrentMap(app)
-        end
-
         % Value changed function: DataSourceURLEditField
         function DataSourceURLEditFieldValueChanged(app, event)
             %-------------------------------------------------------------
@@ -703,6 +652,85 @@ classdef ereef < matlab.apps.AppBase
             drawnow
         end
 
+        % Value changed function: ElevationmDropDown
+        function ElevationmDropDownValueChanged(app, event)
+            %value = app.ElevationmDropDown.Value;
+            app.TemperaturePanel.Title = 'Loading new values for new Depth selection...';
+            drawnow
+            retriveVariableData(app)
+            plotTempCurrentMap(app)
+            app.TemperaturePanel.Title = 'Temperature';
+        end
+
+        % Value changed function: TimeDropDown
+        function TimeDropDownValueChanged(app, event)
+            %value = app.TimeDropDown.Value;
+            app.TemperaturePanel.Title = 'Loading new values for new Time selection...';
+            drawnow
+            retriveVariableData(app)
+            plotTempCurrentMap(app)
+            app.TemperaturePanel.Title = 'Temperature';
+        end
+
+        % Button pushed function: 
+        % SelectLocationforTimeElevationTemperatureMapButton
+        function SelectLocationforTimeElevationTemperatureMapButtonPushed(app, event)
+            if verLessThan('Matlab', '9.9')
+                err_dlg = errordlg('Not supported prior to Matlab R2020b');
+                waitfor(err_dlg);
+            else
+                createTimeTempArray(app)
+            end
+        end
+
+        % Value changed function: ScaleTemperatureColourBarCheckBox
+        function ScaleTemperatureColourBarCheckBoxValueChanged(app, event)
+            %value = app.ScaleTemperatureColourBarCheckBox.Value;
+            plotTempCurrentMap(app)
+        end
+
+        % Value changed function: ShowCurrentsCheckBox
+        function ShowCurrentsCheckBoxValueChanged(app, event)
+            % Toggle on/off currents
+            if app.ShowCurrentsCheckBox.Value == 1 
+                set(app.globalHandles.q,'Visible','on');
+                % if the currents are autoscaled, the scale is meaningless
+                % so switch it off
+                if app.AutoScaleCurrentsCheckBox.Value == 0
+                    set(app.globalHandles.qLeg1,'Visible','on');
+                    set(app.globalHandles.qLeg2,'Visible','on');
+                    set(app.globalHandles.qLeg3,'Visible','on');
+                else
+                    set(app.globalHandles.qLeg1,'Visible','off');
+                    set(app.globalHandles.qLeg2,'Visible','off');
+                    set(app.globalHandles.qLeg3,'Visible','off');
+                end
+            else
+                set(app.globalHandles.q,'Visible','off');
+                set(app.globalHandles.qLeg1,'Visible','off');
+                set(app.globalHandles.qLeg2,'Visible','off');
+                set(app.globalHandles.qLeg3,'Visible','off');
+            end
+        end
+
+        % Value changed function: AutoScaleCurrentsCheckBox
+        function AutoScaleCurrentsCheckBoxValueChanged(app, event)
+            plotTempCurrentMap(app);
+            
+        end
+
+        % Value changed function: ScaleFactorTempEditField
+        function ScaleFactorTempEditFieldValueChanged(app, event)
+            plotTempCurrentMap(app);
+
+        end
+
+        % Value changed function: ScaleFactorCurrentsEditField
+        function ScaleFactorCurrentsEditFieldValueChanged(app, event)
+            plotTempCurrentMap(app);
+            
+        end
+
         % Close request function: UIFigure
         function UIFigureCloseRequest(app, event)
             % first close any figures we created
@@ -710,12 +738,6 @@ classdef ereef < matlab.apps.AppBase
                 try close(app.globalHandles.spawned(i).handle); catch, end
             end
             delete(app)
-        end
-
-        % Value changed function: AutoScaleCurrentsCheckBox
-        function AutoScaleCurrentsCheckBoxValueChanged(app, event)
-            plotTempCurrentMap(app);
-            
         end
     end
 
@@ -755,31 +777,31 @@ classdef ereef < matlab.apps.AppBase
 
             % Create ControlPanel
             app.ControlPanel = uipanel(app.UIFigure);
-            app.ControlPanel.Position = [15 432 251 273];
+            app.ControlPanel.Position = [15 289 251 416];
 
             % Create SelectLocationforTimeElevationTemperatureMapButton
             app.SelectLocationforTimeElevationTemperatureMapButton = uibutton(app.ControlPanel, 'push');
             app.SelectLocationforTimeElevationTemperatureMapButton.ButtonPushedFcn = createCallbackFcn(app, @SelectLocationforTimeElevationTemperatureMapButtonPushed, true);
-            app.SelectLocationforTimeElevationTemperatureMapButton.Position = [13 22 214 38];
+            app.SelectLocationforTimeElevationTemperatureMapButton.Position = [13 165 214 38];
             app.SelectLocationforTimeElevationTemperatureMapButton.Text = {'Select Location for '; 'Time/Elevation Temperature Map'};
 
             % Create ShowCurrentsCheckBox
             app.ShowCurrentsCheckBox = uicheckbox(app.ControlPanel);
             app.ShowCurrentsCheckBox.ValueChangedFcn = createCallbackFcn(app, @ShowCurrentsCheckBoxValueChanged, true);
             app.ShowCurrentsCheckBox.Text = 'Show Currents';
-            app.ShowCurrentsCheckBox.Position = [17 84 101 22];
+            app.ShowCurrentsCheckBox.Position = [17 227 101 22];
             app.ShowCurrentsCheckBox.Value = true;
 
             % Create ScaleTemperatureColourBarCheckBox
             app.ScaleTemperatureColourBarCheckBox = uicheckbox(app.ControlPanel);
             app.ScaleTemperatureColourBarCheckBox.ValueChangedFcn = createCallbackFcn(app, @ScaleTemperatureColourBarCheckBoxValueChanged, true);
             app.ScaleTemperatureColourBarCheckBox.Text = 'Scale Temperature Colour Bar';
-            app.ScaleTemperatureColourBarCheckBox.Position = [15 135 183 23];
+            app.ScaleTemperatureColourBarCheckBox.Position = [15 278 183 23];
 
             % Create ElevationmDropDownLabel
             app.ElevationmDropDownLabel = uilabel(app.ControlPanel);
             app.ElevationmDropDownLabel.HorizontalAlignment = 'right';
-            app.ElevationmDropDownLabel.Position = [12 204 76 22];
+            app.ElevationmDropDownLabel.Position = [12 347 76 22];
             app.ElevationmDropDownLabel.Text = 'Elevation (m)';
 
             % Create ElevationmDropDown
@@ -787,13 +809,13 @@ classdef ereef < matlab.apps.AppBase
             app.ElevationmDropDown.Items = {'-'};
             app.ElevationmDropDown.ItemsData = -1;
             app.ElevationmDropDown.ValueChangedFcn = createCallbackFcn(app, @ElevationmDropDownValueChanged, true);
-            app.ElevationmDropDown.Position = [103 204 100 22];
+            app.ElevationmDropDown.Position = [103 347 100 22];
             app.ElevationmDropDown.Value = -1;
 
             % Create TimeDropDownLabel
             app.TimeDropDownLabel = uilabel(app.ControlPanel);
             app.TimeDropDownLabel.HorizontalAlignment = 'right';
-            app.TimeDropDownLabel.Position = [16 167 31 22];
+            app.TimeDropDownLabel.Position = [16 310 31 22];
             app.TimeDropDownLabel.Text = 'Time';
 
             % Create TimeDropDown
@@ -801,25 +823,51 @@ classdef ereef < matlab.apps.AppBase
             app.TimeDropDown.Items = {'-'};
             app.TimeDropDown.ItemsData = -1;
             app.TimeDropDown.ValueChangedFcn = createCallbackFcn(app, @TimeDropDownValueChanged, true);
-            app.TimeDropDown.Position = [62 167 178 22];
+            app.TimeDropDown.Position = [62 310 178 22];
             app.TimeDropDown.Value = -1;
 
             % Create DataSourceURLEditFieldLabel
             app.DataSourceURLEditFieldLabel = uilabel(app.ControlPanel);
             app.DataSourceURLEditFieldLabel.HorizontalAlignment = 'right';
-            app.DataSourceURLEditFieldLabel.Position = [12 240 99 22];
+            app.DataSourceURLEditFieldLabel.Position = [12 383 99 22];
             app.DataSourceURLEditFieldLabel.Text = 'Data Source URL';
 
             % Create DataSourceURLEditField
             app.DataSourceURLEditField = uieditfield(app.ControlPanel, 'text');
             app.DataSourceURLEditField.ValueChangedFcn = createCallbackFcn(app, @DataSourceURLEditFieldValueChanged, true);
-            app.DataSourceURLEditField.Position = [126 240 113 21];
+            app.DataSourceURLEditField.Position = [126 383 113 21];
 
             % Create AutoScaleCurrentsCheckBox
             app.AutoScaleCurrentsCheckBox = uicheckbox(app.ControlPanel);
             app.AutoScaleCurrentsCheckBox.ValueChangedFcn = createCallbackFcn(app, @AutoScaleCurrentsCheckBoxValueChanged, true);
             app.AutoScaleCurrentsCheckBox.Text = 'Autoscale Currents';
-            app.AutoScaleCurrentsCheckBox.Position = [122 84 124 22];
+            app.AutoScaleCurrentsCheckBox.Position = [122 227 124 22];
+
+            % Create ScaleFactorTempLabel
+            app.ScaleFactorTempLabel = uilabel(app.ControlPanel);
+            app.ScaleFactorTempLabel.HorizontalAlignment = 'right';
+            app.ScaleFactorTempLabel.Position = [42 49 105 22];
+            app.ScaleFactorTempLabel.Text = 'Scale Factor Temp';
+
+            % Create ScaleFactorTempEditField
+            app.ScaleFactorTempEditField = uieditfield(app.ControlPanel, 'numeric');
+            app.ScaleFactorTempEditField.Limits = [1 5000];
+            app.ScaleFactorTempEditField.ValueChangedFcn = createCallbackFcn(app, @ScaleFactorTempEditFieldValueChanged, true);
+            app.ScaleFactorTempEditField.Position = [169 49 49 23];
+            app.ScaleFactorTempEditField.Value = 1;
+
+            % Create ScaleFactorCurrentsEditFieldLabel
+            app.ScaleFactorCurrentsEditFieldLabel = uilabel(app.ControlPanel);
+            app.ScaleFactorCurrentsEditFieldLabel.HorizontalAlignment = 'right';
+            app.ScaleFactorCurrentsEditFieldLabel.Position = [32 12 122 22];
+            app.ScaleFactorCurrentsEditFieldLabel.Text = 'Scale Factor Currents';
+
+            % Create ScaleFactorCurrentsEditField
+            app.ScaleFactorCurrentsEditField = uieditfield(app.ControlPanel, 'numeric');
+            app.ScaleFactorCurrentsEditField.Limits = [1 5000];
+            app.ScaleFactorCurrentsEditField.ValueChangedFcn = createCallbackFcn(app, @ScaleFactorCurrentsEditFieldValueChanged, true);
+            app.ScaleFactorCurrentsEditField.Position = [169 12 49 22];
+            app.ScaleFactorCurrentsEditField.Value = 1000;
 
             % Show the figure after all components are created
             app.UIFigure.Visible = 'on';
