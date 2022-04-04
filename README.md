@@ -1,6 +1,4 @@
----
-typora-root-url: ./
----
+
 
 # **Technical Selection - Task A - Richard Thomson**
 
