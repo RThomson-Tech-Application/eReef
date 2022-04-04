@@ -76,9 +76,9 @@ By clicking the following button:
 
 ![](/screenshots/button.PNG)
 
-a crosshairs will appear (this feature in Matlab is slow unfortunately) allowing the user to select a **specific longitude and latitude**.
+a crosshairs will appear (this feature in Matlab is slow unfortunately) allowing the user to select a **specific longitude and latitude**. A red asterisk will appear on the map.
 
-This will spawn a new figure showing the **temperature** **map** with respect to the **depth** (elevation) and the **time**:
+This will then spawn a new figure showing the **temperature** **map** with respect to the **depth** (elevation) and the **time**:
 
 ![](/screenshots/tempDepthTimeMap.PNG)
 
